@@ -1,5 +1,6 @@
 package me.loving11ish.clans.commands.clanSubCommands;
 
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -12,9 +13,9 @@ import java.util.*;
 
 public class ClanPrefixSubCommand {
 
+    private final Economy economy = Clans.getEconomy();
     private final FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     private final FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
-
     int MIN_CHAR_LIMIT = clansConfig.getInt("clan-tags.min-character-limit");
     int MAX_CHAR_LIMIT = clansConfig.getInt("clan-tags.max-character-limit");
 
@@ -24,6 +25,12 @@ public class ClanPrefixSubCommand {
     public boolean clanPrefixSubCommand(CommandSender sender, String[] args, List<String> bannedTags) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
+            double balance = economy.getBalance(player);
+            double cost =clansConfig.getDouble("clan-creation.cost-renaming-prefix");
+            if(balance < cost) {
+                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("not-enough-money-prefix").replace("%COST%", Double.toString(cost))));
+                return true;
+            }
             clans.forEach((clans) ->
                     clansPrefixList.add(clans.getValue().getClanPrefix()));
             if (args.length == 2) {

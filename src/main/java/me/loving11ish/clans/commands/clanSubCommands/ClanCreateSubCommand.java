@@ -37,16 +37,12 @@ public class ClanCreateSubCommand {
     public boolean createClanSubCommand(CommandSender sender, String[] args, List<String> bannedTags) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-
-
             double balance = economy.getBalance(player);
             double cost =clansConfig.getDouble("clan-creation.cost");
-
             if(balance < cost) {
                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("not-enough-money").replace("%COST%", Double.toString(cost))));
                 return true;
             }
-
             clans.forEach((clans) ->
                     clanNamesList.add(clans.getValue().getClanFinalName()));
             if (args.length >= 2) {
