@@ -9,6 +9,9 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 #ClansLite messages config for ${version}
 
+#Economy Messages
+not-enough-money: "&3You don't have enough money to do that! You need &6%AMOUNT% &3more!"
+
 #Clan Creation Messages
 clan-name-too-short: "&3Clan name too short - minimum length is &6%CHARMIN% &3characters."
 clan-name-too-long: "&3Clan name too long - maximum length is &6%CHARMAX% &3characters."

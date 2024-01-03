@@ -46,6 +46,8 @@ clan-size:
       group-6: 24 #Perm: 'clanslite.maxclansize.group6'
 
 clan-creation:
+    #Set the cost of creating a clan. [Default value: 5000]
+  cost: 5000
   #Do you want a message to be sent to all players when a new clan is created? [Default value: true]
   announce-to-all: true
   #Do you want the message sent as a title instead of a chat message? [Default value: true]

@@ -7,11 +7,13 @@ import io.papermc.lib.PaperLib;
 import me.loving11ish.clans.externalhooks.FloodgateAPI;
 import me.loving11ish.clans.externalhooks.PlaceholderAPI;
 import me.loving11ish.clans.externalhooks.PlugManXAPI;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.geysermc.floodgate.api.FloodgateApi;
 import me.loving11ish.clans.commands.*;
@@ -42,7 +44,7 @@ public final class Clans extends JavaPlugin {
 
     private final PluginDescriptionFile pluginInfo = getDescription();
     private final String pluginVersion = pluginInfo.getVersion();
-
+    private static Economy econ = null;
     private static Clans plugin;
     private static FoliaLib foliaLib;
     private static FloodgateApi floodgateApi;
@@ -141,6 +143,12 @@ public final class Clans extends JavaPlugin {
             console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &cDisabling PlugManX hook loader"));
             console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &6Continuing plugin startup"));
             console.sendMessage(ColorUtils.translateColorCodes("-------------------------------------------"));
+        }
+
+        if (!setupEconomy() ) {
+            getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
         }
 
         //Load the plugin configs
@@ -417,6 +425,18 @@ public final class Clans extends JavaPlugin {
         usermapFileManager = null;
     }
 
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
+    }
+
     public static PlayerMenuUtility getPlayerMenuUtility(Player player) {
         PlayerMenuUtility playerMenuUtility;
         if (!(playerMenuUtilityMap.containsKey(player))) {
@@ -431,7 +451,9 @@ public final class Clans extends JavaPlugin {
     public static Clans getPlugin() {
         return plugin;
     }
-
+    public static Economy getEconomy() {
+        return econ;
+    }
     public static FoliaLib getFoliaLib() {
         return foliaLib;
     }

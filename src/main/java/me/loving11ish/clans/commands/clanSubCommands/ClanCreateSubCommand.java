@@ -1,7 +1,10 @@
 package me.loving11ish.clans.commands.clanSubCommands;
 
+import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -17,9 +20,10 @@ import java.util.*;
 public class ClanCreateSubCommand {
 
     private final ConsoleCommandSender console = Bukkit.getConsoleSender();
-
+    private final Economy economy = Clans.getEconomy();
     private final FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     private final FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
     
     private static final String CLAN_PLACEHOLDER = "%CLAN%";
     private static final String CLAN_OWNER = "%CLANOWNER%";
@@ -33,6 +37,16 @@ public class ClanCreateSubCommand {
     public boolean createClanSubCommand(CommandSender sender, String[] args, List<String> bannedTags) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
+
+
+            double balance = economy.getBalance(player);
+            double cost =clansConfig.getDouble("clan-creation.cost");
+
+            if(balance < cost) {
+                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("not-enough-money").replace("%COST%", Double.toString(cost))));
+                return true;
+            }
+
             clans.forEach((clans) ->
                     clanNamesList.add(clans.getValue().getClanFinalName()));
             if (args.length >= 2) {
@@ -76,6 +90,7 @@ public class ClanCreateSubCommand {
                         String clanCreated = ColorUtils.translateColorCodes(messagesConfig.getString("clan-created-successfully")).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(args[1]));
                         player.sendMessage(clanCreated);
                         fireClanCreateEvent(player, clan);
+                        economy.withdrawPlayer(player, cost);
                         if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                             console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanCreateEvent"));
                         }
